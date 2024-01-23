@@ -1,3 +1,24 @@
 {
-  "extends": "next/core-web-vitals"
+  "rules": {
+    "semi": ["error", "always"],
+    "no-duplicate-imports": ["error", { "includeExports": true }],
+    "complexity": ["error", 10]
+    // "react/jsx-filename-extension": [
+    //   2,
+    //   { "extensions": [".js", ".jsx", ".ts", ".tsx"] }
+    // ]
+  },
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:import/recommended",
+    "airbnb",
+    "airbnb-typescript",
+    "next/core-web-vitals",
+    "prettier"
+  ]
 }

@@ -9,8 +9,13 @@
     "@typescript-eslint/no-shadow": "error",
     "require-await": "off",
     "@typescript-eslint/require-await": "error",
-    "no-nested-ternary": "error"
+    "no-nested-ternary": "error",
+    "react/jsx-props-no-spreading": "off",
+    "import/prefer-default-export": "off"
   },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "root": true,
   "parserOptions": {
     "project": "./tsconfig.json"
   },

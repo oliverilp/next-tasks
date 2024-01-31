@@ -14,7 +14,7 @@ import type {
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import './SortableItem.css';
+import { GripVertical } from 'lucide-react';
 
 interface Props {
   id: UniqueIdentifier;
@@ -58,7 +58,11 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
 
   return (
     <SortableItemContext.Provider value={context}>
-      <li className="SortableItem" ref={setNodeRef} style={style}>
+      <li
+        className="flex flex-grow list-none items-center justify-between rounded-md bg-white px-5 py-3 font-sans font-normal shadow"
+        ref={setNodeRef}
+        style={style}
+      >
         {children}
       </li>
     </SortableItemContext.Provider>
@@ -70,15 +74,15 @@ export function DragHandle() {
 
   return (
     <button
-      className="DragHandle"
+      className="flex w-3 cursor-grab touch-none appearance-none items-center justify-center rounded border-0 bg-transparent p-4 outline-0 hover:bg-black/5"
       {...attributes}
       {...listeners}
       ref={ref}
       type="button"
     >
-      <svg viewBox="0 0 20 20" width="12">
-        <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z" />
-      </svg>
+      <div className="flex-shrink-0">
+        <GripVertical size={16} color="#94a3b8" />
+      </div>
     </button>
   );
 }

@@ -14,6 +14,9 @@ import type {
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+import { Checkbox } from '@/components/ui/Checkbox';
+import { InlineInput } from '@/components/ui/InlineInput';
+
 import { GripVertical } from 'lucide-react';
 
 interface Props {
@@ -59,12 +62,26 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
   return (
     <SortableItemContext.Provider value={context}>
       <li
+        className="group flex list-none items-center gap-1"
+        ref={setNodeRef}
+        style={style}
+      >
+        {children}
+        <div className="flex grow items-center gap-2 rounded-md px-4 group-hover:bg-slate-50 has-[:focus]:bg-blue-50 group-hover:has-[:focus]:bg-blue-50">
+          <Checkbox />
+          <InlineInput
+            placeholder="No Title"
+            className="border-t border-gray-100 group-first:border-t-0"
+          />
+        </div>
+      </li>
+      {/* <li
         className="flex flex-grow list-none items-center justify-between rounded-md bg-white px-5 py-3 font-sans font-normal shadow"
         ref={setNodeRef}
         style={style}
       >
         {children}
-      </li>
+      </li> */}
     </SortableItemContext.Provider>
   );
 }
@@ -73,16 +90,8 @@ export function DragHandle() {
   const { attributes, listeners, ref } = useContext(SortableItemContext);
 
   return (
-    <button
-      className="flex w-3 cursor-grab touch-none appearance-none items-center justify-center rounded border-0 bg-transparent p-4 outline-0 hover:bg-black/5"
-      {...attributes}
-      {...listeners}
-      ref={ref}
-      type="button"
-    >
-      <div className="flex-shrink-0">
-        <GripVertical size={16} color="#94a3b8" />
-      </div>
+    <button {...attributes} {...listeners} ref={ref} type="button">
+      <GripVertical className="invisible w-4 cursor-grab text-slate-400 active:cursor-grabbing group-hover:visible" />
     </button>
   );
 }

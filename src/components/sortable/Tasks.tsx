@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import SortableList from '@/components/sortable/Sortable';
+import SortableList from '@/components/sortable/SortableList';
 
 function createRange<T>(
   length: number,
@@ -9,7 +9,7 @@ function createRange<T>(
 }
 
 function getMockItems() {
-  return createRange(50, (index) => ({ id: index + 1 }));
+  return createRange(15, (index) => ({ id: index + 1 }));
 }
 
 function Tasks() {
@@ -22,7 +22,6 @@ function Tasks() {
         onChange={setItems}
         renderItem={(item) => (
           <SortableList.Item id={item.id}>
-            {item.id}
             <SortableList.DragHandle />
           </SortableList.Item>
         )}

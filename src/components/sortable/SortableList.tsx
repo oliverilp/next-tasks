@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useMemo, useState, ReactNode } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   DndContext,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  Active,
-  UniqueIdentifier
+  Active
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -16,29 +15,26 @@ import {
   sortableKeyboardCoordinates
 } from '@dnd-kit/sortable';
 
+import { Task } from '@/lib/tasks-context';
 import { DragHandle, SortableItem } from './Item/SortableItem';
 import { SortableOverlay } from './Overlay/SortableOverlay';
+import Item from './Item/Item';
 
-interface BaseItem {
-  id: UniqueIdentifier;
+// interface BaseItem {
+//   id: UniqueIdentifier;
+// }
+
+interface Props {
+  items: Task[];
+  onChange(items: Task[]): void;
 }
 
-interface Props<T extends BaseItem> {
-  items: T[];
-  onChange(items: T[]): void;
-  renderItem(item: T): ReactNode;
-}
-
-export default function SortableList<T extends BaseItem>({
-  items,
-  onChange,
-  renderItem
-}: Props<T>) {
+export default function SortableList({ items, onChange }: Props) {
   const [active, setActive] = useState<Active | null>(null);
-  const activeItem = useMemo(
-    () => items.find((item) => item.id === active?.id),
-    [active, items]
-  );
+  const activeItem = useMemo((): Task => {
+    const { tasks } = window as any;
+    return tasks.find((task: Task) => task.id === active?.id);
+  }, [active, items]);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -68,12 +64,16 @@ export default function SortableList<T extends BaseItem>({
       <SortableContext items={items}>
         <ul className="flex list-none flex-col p-0" role="application">
           {items.map((item) => (
-            <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
+            <React.Fragment key={item.id}>
+              <SortableList.Item item={item}>
+                <SortableList.DragHandle />
+              </SortableList.Item>
+            </React.Fragment>
           ))}
         </ul>
       </SortableContext>
       <SortableOverlay>
-        {activeItem ? renderItem(activeItem) : null}
+        {activeItem ? <Item item={activeItem} /> : null}
       </SortableOverlay>
     </DndContext>
   );

@@ -7,20 +7,16 @@ import React, {
   CSSProperties,
   PropsWithChildren
 } from 'react';
-import type {
-  DraggableSyntheticListeners,
-  UniqueIdentifier
-} from '@dnd-kit/core';
+import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import { Checkbox } from '@/components/ui/Checkbox';
-import { InlineInput } from '@/components/ui/InlineInput';
-
 import { GripVertical } from 'lucide-react';
+import { Task } from '@/lib/tasks-context';
+import Item from './Item';
 
 interface Props {
-  id: UniqueIdentifier;
+  item: Task;
 }
 
 interface Context {
@@ -35,7 +31,7 @@ const SortableItemContext = createContext<Context>({
   ref() {}
 });
 
-export function SortableItem({ children, id }: PropsWithChildren<Props>) {
+export function SortableItem({ children, item }: PropsWithChildren<Props>) {
   const {
     attributes,
     isDragging,
@@ -44,7 +40,7 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
     setActivatorNodeRef,
     transform,
     transition
-  } = useSortable({ id });
+  } = useSortable({ id: item.id });
   const context = useMemo(
     () => ({
       attributes,
@@ -59,29 +55,43 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
     transition
   };
 
+  const changeStatus = (event: any) => {
+    if (!(window as any).tasks) {
+      console.log('status: missing tasks');
+      return;
+    }
+    const { tasks } = window as any;
+    const index = tasks.findIndex((task: Task) => task.id === item.id);
+    const task = tasks.at(index);
+    if (index < 0) return;
+    const newTask = { ...task, done: event };
+    tasks.splice(index, 1, newTask);
+    console.log('status', tasks);
+  };
+
+  const changeText = (event: any) => {
+    if (!(window as any).tasks) {
+      console.log('text: missing tasks');
+      return;
+    }
+    const { tasks } = window as any;
+    const index = tasks.findIndex((task: Task) => task.id === item.id);
+    const task = tasks.at(index);
+    const newTask = { ...task, value: event.target.value };
+    tasks.splice(index, 1, newTask);
+    console.log('text', tasks);
+  };
+
   return (
     <SortableItemContext.Provider value={context}>
-      <li
-        className="group flex list-none items-center gap-1"
+      <Item
+        changeStatus={changeStatus}
+        changeText={changeText}
         ref={setNodeRef}
         style={style}
       >
         {children}
-        <div className="flex grow items-center gap-2 rounded-md px-4 group-hover:bg-slate-50 has-[:focus]:bg-blue-50 group-hover:has-[:focus]:bg-blue-50">
-          <Checkbox />
-          <InlineInput
-            placeholder="No Title"
-            className="border-t border-gray-100 group-first:border-t-0"
-          />
-        </div>
-      </li>
-      {/* <li
-        className="flex flex-grow list-none items-center justify-between rounded-md bg-white px-5 py-3 font-sans font-normal shadow"
-        ref={setNodeRef}
-        style={style}
-      >
-        {children}
-      </li> */}
+      </Item>
     </SortableItemContext.Provider>
   );
 }
@@ -90,7 +100,13 @@ export function DragHandle() {
   const { attributes, listeners, ref } = useContext(SortableItemContext);
 
   return (
-    <button {...attributes} {...listeners} ref={ref} type="button">
+    <button
+      {...attributes}
+      {...listeners}
+      ref={ref}
+      type="button"
+      tabIndex={-1}
+    >
       <GripVertical className="invisible w-4 cursor-grab text-slate-400 active:cursor-grabbing group-hover:visible" />
     </button>
   );

@@ -7,16 +7,19 @@ import React, {
   CSSProperties,
   PropsWithChildren
 } from 'react';
-import type { DraggableSyntheticListeners } from '@dnd-kit/core';
+import type {
+  DraggableSyntheticListeners,
+  UniqueIdentifier
+} from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 import { GripVertical } from 'lucide-react';
-import { Task } from '@/lib/tasks-context';
+import { Task, useTasksContext } from '@/lib/tasks-context';
 import Item from './Item';
 
 interface Props {
-  item: Task;
+  id: UniqueIdentifier;
 }
 
 interface Context {
@@ -31,7 +34,7 @@ const SortableItemContext = createContext<Context>({
   ref() {}
 });
 
-export function SortableItem({ children, item }: PropsWithChildren<Props>) {
+export function SortableItem({ children, id }: PropsWithChildren<Props>) {
   const {
     attributes,
     isDragging,
@@ -40,7 +43,7 @@ export function SortableItem({ children, item }: PropsWithChildren<Props>) {
     setActivatorNodeRef,
     transform,
     transition
-  } = useSortable({ id: item.id });
+  } = useSortable({ id });
   const context = useMemo(
     () => ({
       attributes,
@@ -55,36 +58,27 @@ export function SortableItem({ children, item }: PropsWithChildren<Props>) {
     transition
   };
 
+  const { tasks, setTasks } = useTasksContext();
+
+  const index = tasks.findIndex((task: Task) => task.id === id);
+  const task = tasks.at(index);
+
   const changeStatus = (event: any) => {
-    if (!(window as any).tasks) {
-      console.log('status: missing tasks');
-      return;
-    }
-    const { tasks } = window as any;
-    const index = tasks.findIndex((task: Task) => task.id === item.id);
-    const task = tasks.at(index);
-    if (index < 0) return;
+    if (index < 0 || !task) return;
     const newTask = { ...task, done: event };
-    tasks.splice(index, 1, newTask);
-    console.log('status', tasks);
+    setTasks(tasks.toSpliced(index, 1, newTask));
   };
 
   const changeText = (event: any) => {
-    if (!(window as any).tasks) {
-      console.log('text: missing tasks');
-      return;
-    }
-    const { tasks } = window as any;
-    const index = tasks.findIndex((task: Task) => task.id === item.id);
-    const task = tasks.at(index);
+    if (index < 0 || !task) return;
     const newTask = { ...task, value: event.target.value };
-    tasks.splice(index, 1, newTask);
-    console.log('text', tasks);
+    setTasks(tasks.toSpliced(index, 1, newTask));
   };
 
   return (
     <SortableItemContext.Provider value={context}>
       <Item
+        task={task}
         changeStatus={changeStatus}
         changeText={changeText}
         ref={setNodeRef}

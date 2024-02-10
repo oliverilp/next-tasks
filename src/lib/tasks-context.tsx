@@ -14,12 +14,12 @@ interface TasksContextProviderProps {
   children: React.ReactNode;
 }
 
-interface TasksContextInt {
+interface TasksContextState {
   tasks: Task[];
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
 
-export const TasksContext = createContext<TasksContextInt | null>(null);
+const TasksContext = createContext<TasksContextState | null>(null);
 
 export default function TasksContextProvider({
   items,

@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import SortableList from '@/components/sortable/SortableList';
-import { Task } from '@/lib/tasks-context';
+import TasksContextProvider, { Task } from '@/lib/tasks-context';
+import { UniqueIdentifier } from '@dnd-kit/core';
 
 function createRange<T>(
   length: number,
@@ -12,27 +13,27 @@ function createRange<T>(
 }
 
 function getMockTasks() {
-  return createRange<Task>(15, (index) => ({
+  return createRange<Task>(10, (index) => ({
     id: index + 1,
     value: '',
     done: false
   }));
 }
 
-// function getMockItems(): number[] {
-//   return createRange(15, (index) => index);
-// }
+function getMockItems(): UniqueIdentifier[] {
+  return createRange(10, (index) => index + 1);
+}
+
+const tasks = getMockTasks();
 
 function Tasks() {
-  const [items, setItems] = useState(getMockTasks);
-  const global: Window & { tasks?: Task[] } = window;
-  if (!global.tasks) {
-    global.tasks = JSON.parse(JSON.stringify(items));
-  }
+  const [items, setItems] = useState(getMockItems());
 
   return (
     <div className="flex-grow">
-      <SortableList items={items} onChange={setItems} />
+      <TasksContextProvider items={tasks}>
+        <SortableList items={items} onChange={setItems} />
+      </TasksContextProvider>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { InlineInput } from '@/components/ui/InlineInput';
 import { Task } from '@/lib/tasks-context';
+import { cn } from '@/lib/utils';
 
 interface Props {
   task?: Task;
@@ -9,7 +10,10 @@ interface Props {
 }
 
 const Item = forwardRef(
-  ({ task, changeStatus, changeText, children, ...props }: Props, ref: any) => {
+  (
+    { task, changeStatus, changeText, className, children, ...props }: Props,
+    ref: any
+  ) => {
     const { done, value } = task ?? {};
 
     return (
@@ -19,7 +23,12 @@ const Item = forwardRef(
         {...props}
       >
         {children}
-        <div className="flex grow items-center gap-2 rounded-md px-4 group-hover:bg-slate-50 has-[:focus]:bg-blue-50 group-hover:has-[:focus]:bg-blue-50">
+        <div
+          className={cn(
+            'flex grow items-center gap-2 rounded-md px-4 group-hover:bg-slate-50 has-[:focus]:bg-blue-50 group-hover:has-[:focus]:bg-blue-50',
+            className
+          )}
+        >
           <Checkbox
             onCheckedChange={changeStatus}
             defaultChecked={done ?? false}

@@ -15,7 +15,7 @@ function createRange<T>(
 function getMockTasks() {
   return createRange<Task>(10, (index) => ({
     id: index + 1,
-    value: '',
+    value: `${index + 1}`,
     done: false
   }));
 }
@@ -27,7 +27,7 @@ function getMockItems(): UniqueIdentifier[] {
 const tasks = getMockTasks();
 
 function Tasks() {
-  const [items, setItems] = useState(getMockItems());
+  const [items, setItems] = useState(getMockItems);
 
   return (
     <div className="flex-grow">

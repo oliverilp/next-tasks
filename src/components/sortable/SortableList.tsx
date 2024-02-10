@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   DndContext,
   KeyboardSensor,
@@ -8,7 +8,9 @@ import {
   useSensor,
   useSensors,
   Active,
-  UniqueIdentifier
+  UniqueIdentifier,
+  DragStartEvent,
+  DragEndEvent
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -28,7 +30,7 @@ interface Props {
 
 export default function SortableList({ items, onChange }: Props) {
   const [active, setActive] = useState<Active | null>(null);
-  const { tasks } = useTasksContext();
+  const { tasks, setTasks } = useTasksContext();
 
   const activeItem = tasks.find((task: Task) => task.id === active?.id);
 
@@ -39,24 +41,36 @@ export default function SortableList({ items, onChange }: Props) {
     })
   );
 
+  useEffect(() => {
+    setTasks(
+      tasks.slice().sort((a, b) => items.indexOf(a.id) - items.indexOf(b.id))
+    );
+  }, [items]);
+
+  const onDragStart = ({ active: startActive }: DragStartEvent) => {
+    setActive(startActive);
+  };
+
+  const onDragEnd = ({ active: endActive, over }: DragEndEvent) => {
+    if (over && endActive.id !== over.id) {
+      const activeIndex = items.findIndex((id) => id === endActive.id);
+      const overIndex = items.findIndex((id) => id === over.id);
+
+      onChange(arrayMove(items, activeIndex, overIndex));
+    }
+    setActive(null);
+  };
+
+  const onDragCancel = () => {
+    setActive(null);
+  };
+
   return (
     <DndContext
       sensors={sensors}
-      onDragStart={({ active: startActive }) => {
-        setActive(startActive);
-      }}
-      onDragEnd={({ active: endActive, over }) => {
-        if (over && endActive.id !== over.id) {
-          const activeIndex = items.findIndex((id) => id === endActive.id);
-          const overIndex = items.findIndex((id) => id === over.id);
-
-          onChange(arrayMove(items, activeIndex, overIndex));
-        }
-        setActive(null);
-      }}
-      onDragCancel={() => {
-        setActive(null);
-      }}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      onDragCancel={onDragCancel}
     >
       <SortableContext items={items}>
         <ul className="flex list-none flex-col p-0" role="application">
@@ -70,7 +84,12 @@ export default function SortableList({ items, onChange }: Props) {
         </ul>
       </SortableContext>
       <SortableOverlay>
-        {activeItem ? <Item task={activeItem} /> : null}
+        {activeItem ? (
+          <Item
+            task={activeItem}
+            className="cursor-grabbing opacity-50 shadow-lg"
+          />
+        ) : null}
       </SortableOverlay>
     </DndContext>
   );

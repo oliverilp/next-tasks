@@ -9,11 +9,11 @@ import {
 
 const dropAnimationConfig: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
-    styles: {
-      active: {
-        opacity: '0.4'
-      }
-    }
+    // styles: {
+    //   active: {
+    //     opacity: '0.5'
+    //   }
+    // }
   })
 };
 

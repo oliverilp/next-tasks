@@ -5,18 +5,26 @@ import React, {
   useContext,
   useMemo,
   CSSProperties,
-  PropsWithChildren
+  PropsWithChildren,
+  useState
 } from 'react';
-import type {
-  DraggableSyntheticListeners,
-  UniqueIdentifier
+import {
+  useDndMonitor,
+  type DraggableSyntheticListeners,
+  type UniqueIdentifier
 } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 
 import { GripVertical } from 'lucide-react';
 import { Task, useTasksContext } from '@/lib/tasks-context';
 import Item from './Item';
+import Indicator from './Indicator';
+
+enum Position {
+  Before,
+  After,
+  None
+}
 
 interface Props {
   id: UniqueIdentifier;
@@ -41,9 +49,9 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
     listeners,
     setNodeRef,
     setActivatorNodeRef,
-    transform,
     transition
   } = useSortable({ id });
+
   const context = useMemo(
     () => ({
       attributes,
@@ -52,16 +60,37 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
     }),
     [attributes, listeners, setActivatorNodeRef]
   );
+
   const style: CSSProperties = {
     opacity: isDragging ? 0.4 : undefined,
-    transform: CSS.Translate.toString(transform),
     transition
   };
+  const [indicatorPosition, setIndicatorPosition] = useState<Position>(
+    Position.None
+  );
 
   const { tasks, setTasks } = useTasksContext();
-
   const index = tasks.findIndex((task: Task) => task.id === id);
   const task = tasks.at(index);
+
+  useDndMonitor({
+    onDragOver({ active, over }) {
+      if (over?.id !== id) {
+        setIndicatorPosition(Position.None);
+        return;
+      }
+      const activeIndex = tasks.findIndex((item) => item.id === active.id);
+      setIndicatorPosition(
+        index <= activeIndex ? Position.Before : Position.After
+      );
+    },
+    onDragEnd() {
+      setIndicatorPosition(Position.None);
+    },
+    onDragCancel() {
+      setIndicatorPosition(Position.None);
+    }
+  });
 
   const changeStatus = (event: any) => {
     if (index < 0 || !task) return;
@@ -77,6 +106,7 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
 
   return (
     <SortableItemContext.Provider value={context}>
+      {indicatorPosition === Position.Before && <Indicator />}
       <Item
         task={task}
         changeStatus={changeStatus}
@@ -86,6 +116,7 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
       >
         {children}
       </Item>
+      {indicatorPosition === Position.After && <Indicator />}
     </SortableItemContext.Provider>
   );
 }

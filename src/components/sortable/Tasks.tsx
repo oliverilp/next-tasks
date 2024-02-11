@@ -5,6 +5,8 @@ import SortableList from '@/components/sortable/SortableList';
 import TasksContextProvider, { Task } from '@/lib/tasks-context';
 import { UniqueIdentifier } from '@dnd-kit/core';
 
+const total = 15;
+
 function createRange<T>(
   length: number,
   initializer: (index: number) => T
@@ -13,7 +15,7 @@ function createRange<T>(
 }
 
 function getMockTasks() {
-  return createRange<Task>(10, (index) => ({
+  return createRange<Task>(total, (index) => ({
     id: index + 1,
     value: `${index + 1}`,
     done: false
@@ -21,7 +23,7 @@ function getMockTasks() {
 }
 
 function getMockItems(): UniqueIdentifier[] {
-  return createRange(10, (index) => index + 1);
+  return createRange(total, (index) => index + 1);
 }
 
 const tasks = getMockTasks();

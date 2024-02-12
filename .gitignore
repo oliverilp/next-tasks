@@ -38,3 +38,7 @@ next-env.d.ts
 
 # ide
 .vscode/*
+
+# docker
+/docker/.env
+/docker/postgres_data

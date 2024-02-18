@@ -7,12 +7,17 @@ import { CreateTask } from './schema';
 import { InputType, ReturnType } from './types';
 
 async function handler(data: InputType): Promise<ReturnType> {
-  const { title, index } = data;
+  const { title, order } = data;
 
   try {
+    // await new Promise((resolve) => {
+    //   setTimeout(resolve, 1000);
+    // });
+    // throw new Error();
+
     await prisma.task.updateMany({
       where: {
-        order: { gte: index }
+        order: { gte: order }
       },
       data: {
         order: { increment: 1 }
@@ -23,7 +28,7 @@ async function handler(data: InputType): Promise<ReturnType> {
       data: {
         title,
         done: false,
-        order: index
+        order
       },
       select: {
         id: true,

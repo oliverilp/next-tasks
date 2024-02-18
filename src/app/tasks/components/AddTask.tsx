@@ -1,12 +1,12 @@
 'use client';
 
 import { Input } from '@/components/ui/Input';
-import { createTask } from '@/server/actions/create-task';
 import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { z } from 'zod';
+import { useTasksContext } from '@/lib/tasks-context';
 
 const FormSchema = z.object({
   title: z
@@ -21,6 +21,8 @@ const FormSchema = z.object({
 type FormType = z.infer<typeof FormSchema>;
 
 function AddTask() {
+  const { addTask } = useTasksContext();
+
   const {
     register,
     handleSubmit,
@@ -30,10 +32,8 @@ function AddTask() {
     resolver: zodResolver(FormSchema)
   });
 
-  const onSubmit: SubmitHandler<FormType> = async ({ title }) => {
-    const result = await createTask({ title, index: 0 });
-    console.log('result', result);
-
+  const onSubmit: SubmitHandler<FormType> = ({ title }) => {
+    addTask(title, 0);
     reset();
   };
 

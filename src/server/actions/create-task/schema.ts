@@ -5,5 +5,5 @@ export const CreateTask = z.object({
     required_error: 'Title is required',
     invalid_type_error: 'Title is required'
   }),
-  index: z.number().nonnegative().finite().safe()
+  order: z.number().nonnegative().finite().safe()
 });

@@ -1,32 +1,37 @@
 'use client';
 
 import { TaskDto } from '@/server/dto/TaskDto';
-import React, { createContext, useContext, useMemo } from 'react';
-
-interface TasksContextProviderProps {
-  tasks: TaskDto[];
-  setTasks: React.Dispatch<React.SetStateAction<TaskDto[]>>;
-  children: React.ReactNode;
-}
+import React, {
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useMemo
+} from 'react';
 
 interface TasksContextState {
   tasks: TaskDto[];
-  setTasks: React.Dispatch<React.SetStateAction<TaskDto[]>>;
+  addTask: (title: string, index: number) => void;
+  reorder: (newTasks: TaskDto[]) => void;
+  updateTask: (task: TaskDto, index: number) => void;
 }
 
 const TasksContext = createContext<TasksContextState | null>(null);
 
 export default function TasksContextProvider({
   tasks,
-  setTasks,
+  addTask,
+  reorder,
+  updateTask,
   children
-}: TasksContextProviderProps) {
+}: PropsWithChildren<TasksContextState>) {
   const context = useMemo(
     () => ({
       tasks,
-      setTasks
+      addTask,
+      reorder,
+      updateTask
     }),
-    [tasks, setTasks]
+    [tasks]
   );
 
   return (

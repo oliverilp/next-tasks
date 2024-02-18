@@ -66,7 +66,7 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
     Position.None
   );
 
-  const { tasks, setTasks } = useTasksContext();
+  const { tasks, updateTask } = useTasksContext();
   const index = tasks.findIndex((task: TaskDto) => task.id === id);
   const task = tasks.at(index);
 
@@ -92,13 +92,13 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
   const changeStatus = (done: boolean) => {
     if (index < 0 || !task) return;
     const newTask = { ...task, done };
-    setTasks(tasks.toSpliced(index, 1, newTask));
+    updateTask(newTask, index);
   };
 
   const changeText = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (index < 0 || !task) return;
-    const newTask = { ...task, value: event.target.value };
-    setTasks(tasks.toSpliced(index, 1, newTask));
+    const newTask = { ...task, title: event.target.value };
+    updateTask(newTask, index);
   };
 
   return (

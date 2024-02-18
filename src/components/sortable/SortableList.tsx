@@ -30,7 +30,7 @@ interface Props {
 
 export default function SortableList({ rows, onChange }: Props) {
   const [active, setActive] = useState<Active | null>(null);
-  const { tasks, setTasks } = useTasksContext();
+  const { tasks, reorder } = useTasksContext();
 
   const activeItem = tasks.find((task: TaskDto) => task.id === active?.id);
 
@@ -42,9 +42,11 @@ export default function SortableList({ rows, onChange }: Props) {
   );
 
   useEffect(() => {
-    setTasks(
-      tasks.slice().sort((a, b) => rows.indexOf(a.id) - rows.indexOf(b.id))
-    );
+    const newTasks = tasks
+      .slice()
+      .sort((a, b) => rows.indexOf(a.id) - rows.indexOf(b.id))
+      .map((item, i) => ({ ...item, order: i }));
+    reorder(newTasks);
   }, [rows]);
 
   const onDragStart = ({ active: startActive }: DragStartEvent) => {

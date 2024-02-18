@@ -8,15 +8,12 @@ import React, {
   PropsWithChildren,
   useState
 } from 'react';
-import {
-  useDndMonitor,
-  type DraggableSyntheticListeners,
-  type UniqueIdentifier
-} from '@dnd-kit/core';
+import { useDndMonitor, type DraggableSyntheticListeners } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 
 import { GripVertical } from 'lucide-react';
-import { Task, useTasksContext } from '@/lib/tasks-context';
+import { useTasksContext } from '@/lib/tasks-context';
+import { TaskDto } from '@/server/dto/TaskDto';
 import Item from './Item';
 import Indicator from './Indicator';
 
@@ -27,7 +24,7 @@ enum Position {
 }
 
 interface Props {
-  id: UniqueIdentifier;
+  id: number;
 }
 
 interface Context {
@@ -70,7 +67,7 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
   );
 
   const { tasks, setTasks } = useTasksContext();
-  const index = tasks.findIndex((task: Task) => task.id === id);
+  const index = tasks.findIndex((task: TaskDto) => task.id === id);
   const task = tasks.at(index);
 
   useDndMonitor({
@@ -92,13 +89,13 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
     }
   });
 
-  const changeStatus = (event: any) => {
+  const changeStatus = (done: boolean) => {
     if (index < 0 || !task) return;
-    const newTask = { ...task, done: event };
+    const newTask = { ...task, done };
     setTasks(tasks.toSpliced(index, 1, newTask));
   };
 
-  const changeText = (event: any) => {
+  const changeText = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (index < 0 || !task) return;
     const newTask = { ...task, value: event.target.value };
     setTasks(tasks.toSpliced(index, 1, newTask));

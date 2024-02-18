@@ -1,20 +1,23 @@
-import React, { forwardRef } from 'react';
+import React, { PropsWithChildren, forwardRef } from 'react';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { InlineInput } from '@/components/ui/InlineInput';
-import { Task } from '@/lib/tasks-context';
 import { cn } from '@/lib/utils';
+import { TaskDto } from '@/server/dto/TaskDto';
 
-interface Props {
-  task?: Task;
-  [key: string]: any;
+interface Props extends PropsWithChildren {
+  task?: TaskDto;
+  changeStatus?: (done: boolean) => void;
+  changeText?: React.ChangeEventHandler<HTMLInputElement>;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 const Item = forwardRef(
   (
     { task, changeStatus, changeText, className, children, ...props }: Props,
-    ref: any
+    ref: React.LegacyRef<HTMLLIElement>
   ) => {
-    const { done, value } = task ?? {};
+    const { done, title } = task ?? {};
 
     return (
       <li
@@ -36,7 +39,7 @@ const Item = forwardRef(
           <InlineInput
             onChange={changeText}
             placeholder="No Title"
-            defaultValue={value ?? ''}
+            defaultValue={title ?? ''}
             className="border-t border-gray-100 group-first:border-t-0"
           />
         </div>
@@ -45,6 +48,12 @@ const Item = forwardRef(
   }
 );
 Item.displayName = 'Item';
-Item.defaultProps = { task: {} };
+Item.defaultProps = {
+  task: undefined,
+  changeStatus: undefined,
+  changeText: undefined,
+  className: '',
+  style: {}
+};
 
 export default Item;

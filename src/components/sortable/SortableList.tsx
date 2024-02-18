@@ -8,7 +8,6 @@ import {
   useSensor,
   useSensors,
   Active,
-  UniqueIdentifier,
   DragStartEvent,
   DragEndEvent
 } from '@dnd-kit/core';
@@ -18,21 +17,22 @@ import {
   sortableKeyboardCoordinates
 } from '@dnd-kit/sortable';
 
-import { Task, useTasksContext } from '@/lib/tasks-context';
+import { useTasksContext } from '@/lib/tasks-context';
+import { TaskDto } from '@/server/dto/TaskDto';
 import { DragHandle, SortableItem } from './Item/SortableItem';
 import { SortableOverlay } from './Overlay/SortableOverlay';
 import Item from './Item/Item';
 
 interface Props {
-  items: UniqueIdentifier[];
-  onChange(items: UniqueIdentifier[]): void;
+  rows: number[];
+  onChange(rows: number[]): void;
 }
 
-export default function SortableList({ items, onChange }: Props) {
+export default function SortableList({ rows, onChange }: Props) {
   const [active, setActive] = useState<Active | null>(null);
   const { tasks, setTasks } = useTasksContext();
 
-  const activeItem = tasks.find((task: Task) => task.id === active?.id);
+  const activeItem = tasks.find((task: TaskDto) => task.id === active?.id);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -43,9 +43,9 @@ export default function SortableList({ items, onChange }: Props) {
 
   useEffect(() => {
     setTasks(
-      tasks.slice().sort((a, b) => items.indexOf(a.id) - items.indexOf(b.id))
+      tasks.slice().sort((a, b) => rows.indexOf(a.id) - rows.indexOf(b.id))
     );
-  }, [items]);
+  }, [rows]);
 
   const onDragStart = ({ active: startActive }: DragStartEvent) => {
     setActive(startActive);
@@ -53,10 +53,10 @@ export default function SortableList({ items, onChange }: Props) {
 
   const onDragEnd = ({ active: endActive, over }: DragEndEvent) => {
     if (over && endActive.id !== over.id) {
-      const activeIndex = items.findIndex((id) => id === endActive.id);
-      const overIndex = items.findIndex((id) => id === over.id);
+      const activeIndex = rows.findIndex((id) => id === endActive.id);
+      const overIndex = rows.findIndex((id) => id === over.id);
 
-      onChange(arrayMove(items, activeIndex, overIndex));
+      onChange(arrayMove(rows, activeIndex, overIndex));
     }
     setActive(null);
   };
@@ -72,9 +72,9 @@ export default function SortableList({ items, onChange }: Props) {
       onDragEnd={onDragEnd}
       onDragCancel={onDragCancel}
     >
-      <SortableContext items={items}>
+      <SortableContext items={rows}>
         <ul className="flex list-none flex-col p-0" role="application">
-          {items.map((id) => (
+          {rows.map((id) => (
             <React.Fragment key={id}>
               <SortableList.Item id={id}>
                 <SortableList.DragHandle />

@@ -32,8 +32,8 @@ function AddTask() {
     resolver: zodResolver(FormSchema)
   });
 
-  const onSubmit: SubmitHandler<FormType> = ({ title }) => {
-    addTask(title, 0);
+  const onSubmit: SubmitHandler<FormType> = async ({ title }) => {
+    void addTask(title, 0);
     reset();
   };
 

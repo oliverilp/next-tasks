@@ -5,6 +5,8 @@ import SortableList from '@/components/sortable/SortableList';
 import TasksContextProvider from '@/lib/tasks-context';
 import { TaskDto } from '@/server/dto/TaskDto';
 import { createTask } from '@/server/actions/create-task';
+import { updateTask } from '@/server/actions/update-task';
+import { useDebouncedCallback } from 'use-debounce';
 import AddTask from './AddTask';
 
 interface Props {
@@ -22,9 +24,24 @@ function Tasks({ items }: Props) {
   useEffect(() => {
     setTasks(items);
     setRows(getRows(items));
+    // console.log('useEffect', items);
   }, [items]);
 
-  const addTask = async (title: string, index = 0) => {
+  useEffect(() => {
+    // console.log('new tasks', tasks);
+  }, [tasks]);
+
+  const debounced = useDebouncedCallback(async (task: TaskDto) => {
+    const result = await updateTask({
+      id: task.id,
+      title: task.title,
+      done: task.done
+    });
+
+    console.log('result', result);
+  }, 750);
+
+  const add = async (title: string, index = 0) => {
     const fakeId = -tasks.length;
     const task = {
       id: fakeId,
@@ -39,21 +56,22 @@ function Tasks({ items }: Props) {
     console.log('result', result);
   };
 
-  const reorder = (newTasks: TaskDto[]) => {
+  const reorder = async (newTasks: TaskDto[]) => {
     setTasks(newTasks);
   };
 
-  const updateTask = (task: TaskDto, index: number) => {
+  const update = (task: TaskDto, index: number) => {
     setTasks(tasks.toSpliced(index, 1, task));
+    debounced(task);
   };
 
   return (
     <div className="flex-grow">
       <TasksContextProvider
         tasks={tasks}
-        addTask={addTask}
+        addTask={add}
         reorder={reorder}
-        updateTask={updateTask}
+        updateTask={update}
       >
         <AddTask />
         <SortableList rows={rows} onChange={setRows} />

@@ -69,6 +69,9 @@ export function SortableItem({ children, id }: PropsWithChildren<Props>) {
   const { tasks, updateTask } = useTasksContext();
   const index = tasks.findIndex((task: TaskDto) => task.id === id);
   const task = tasks.at(index);
+  if (task?.order == 0) {
+    // console.log('my task', task);
+  }
 
   useDndMonitor({
     onDragOver({ active, over }) {

@@ -10,8 +10,8 @@ import React, {
 
 interface TasksContextState {
   tasks: TaskDto[];
-  addTask: (title: string, index: number) => void;
-  reorder: (newTasks: TaskDto[]) => void;
+  addTask: (title: string, index: number) => Promise<void>;
+  reorder: (newTasks: TaskDto[]) => Promise<void>;
   updateTask: (task: TaskDto, index: number) => void;
 }
 

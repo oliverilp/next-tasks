@@ -10,11 +10,6 @@ async function handler(data: InputType): Promise<ReturnType> {
   const { title, order } = data;
 
   try {
-    // await new Promise((resolve) => {
-    //   setTimeout(resolve, 1000);
-    // });
-    // throw new Error();
-
     await prisma.task.updateMany({
       where: {
         order: { gte: order }
@@ -40,7 +35,7 @@ async function handler(data: InputType): Promise<ReturnType> {
 
     return { success: true, data: task };
   } catch (error) {
-    return { success: false, error: 'Failed to save to database.' };
+    return { success: false, error: 'Failed to create a task.' };
   } finally {
     revalidatePath('/');
   }

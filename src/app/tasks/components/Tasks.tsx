@@ -7,6 +7,7 @@ import { TaskDto } from '@/server/dto/TaskDto';
 import { createTask } from '@/server/actions/create-task';
 import { updateTask } from '@/server/actions/update-task';
 import { useDebouncedCallback } from 'use-debounce';
+import { updateTaskOrder } from '@/server/actions/update-task-order';
 import AddTask from './AddTask';
 
 interface Props {
@@ -32,14 +33,10 @@ function Tasks({ items }: Props) {
   }, [tasks]);
 
   const debounced = useDebouncedCallback(async (task: TaskDto) => {
-    const result = await updateTask({
-      id: task.id,
-      title: task.title,
-      done: task.done
-    });
+    const result = await updateTask(task);
 
     console.log('result', result);
-  }, 750);
+  }, 1000);
 
   const add = async (title: string, index = 0) => {
     const fakeId = -tasks.length;
@@ -56,13 +53,23 @@ function Tasks({ items }: Props) {
     console.log('result', result);
   };
 
-  const reorder = async (newTasks: TaskDto[]) => {
+  const reorder = async (newRows: number[]) => {
+    setRows(newRows);
+
+    const newTasks = tasks
+      .slice()
+      .sort((a, b) => newRows.indexOf(a.id) - newRows.indexOf(b.id))
+      .map((item, i) => ({ ...item, order: i }));
     setTasks(newTasks);
+
+    console.log('reorder');
+    console.log(await updateTaskOrder({ items: newTasks }));
   };
 
   const update = (task: TaskDto, index: number) => {
+    console.log('update task', task.id);
     setTasks(tasks.toSpliced(index, 1, task));
-    debounced(task);
+    void debounced(task);
   };
 
   return (
@@ -74,7 +81,7 @@ function Tasks({ items }: Props) {
         updateTask={update}
       >
         <AddTask />
-        <SortableList rows={rows} onChange={setRows} />
+        <SortableList rows={rows} />
       </TasksContextProvider>
     </div>
   );

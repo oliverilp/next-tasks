@@ -11,7 +11,7 @@ import React, {
 interface TasksContextState {
   tasks: TaskDto[];
   addTask: (title: string, index: number) => Promise<void>;
-  reorder: (newTasks: TaskDto[]) => Promise<void>;
+  reorder: (newRows: number[]) => Promise<void>;
   updateTask: (task: TaskDto, index: number) => void;
 }
 

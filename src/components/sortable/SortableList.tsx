@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   DndContext,
   KeyboardSensor,
@@ -25,10 +25,9 @@ import Item from './Item/Item';
 
 interface Props {
   rows: number[];
-  onChange(rows: number[]): void;
 }
 
-export default function SortableList({ rows, onChange }: Props) {
+export default function SortableList({ rows }: Props) {
   const [active, setActive] = useState<Active | null>(null);
   const { tasks, reorder } = useTasksContext();
 
@@ -41,14 +40,6 @@ export default function SortableList({ rows, onChange }: Props) {
     })
   );
 
-  useEffect(() => {
-    const newTasks = tasks
-      .slice()
-      .sort((a, b) => rows.indexOf(a.id) - rows.indexOf(b.id))
-      .map((item, i) => ({ ...item, order: i }));
-    reorder(newTasks);
-  }, [rows]);
-
   const onDragStart = ({ active: startActive }: DragStartEvent) => {
     setActive(startActive);
   };
@@ -58,7 +49,7 @@ export default function SortableList({ rows, onChange }: Props) {
       const activeIndex = rows.findIndex((id) => id === endActive.id);
       const overIndex = rows.findIndex((id) => id === over.id);
 
-      onChange(arrayMove(rows, activeIndex, overIndex));
+      void reorder(arrayMove(rows, activeIndex, overIndex));
     }
     setActive(null);
   };

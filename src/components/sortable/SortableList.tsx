@@ -17,7 +17,7 @@ import {
   sortableKeyboardCoordinates
 } from '@dnd-kit/sortable';
 
-import { useTasksContext } from '@/lib/tasks-context';
+import { useTasksContext } from '@/lib/use-tasks-context';
 import { TaskDto } from '@/server/dto/TaskDto';
 import { DragHandle, SortableItem } from './Item/SortableItem';
 import { SortableOverlay } from './Overlay/SortableOverlay';

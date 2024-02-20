@@ -6,7 +6,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { z } from 'zod';
-import { useTasksContext } from '@/lib/tasks-context';
+import { useTasksContext } from '@/lib/use-tasks-context';
 
 const FormSchema = z.object({
   title: z
@@ -32,7 +32,7 @@ function AddTask() {
     resolver: zodResolver(FormSchema)
   });
 
-  const onSubmit: SubmitHandler<FormType> = async ({ title }) => {
+  const onSubmit: SubmitHandler<FormType> = ({ title }) => {
     void addTask(title, 0);
     reset();
   };

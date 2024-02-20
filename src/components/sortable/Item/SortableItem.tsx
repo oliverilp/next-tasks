@@ -12,7 +12,7 @@ import { useDndMonitor, type DraggableSyntheticListeners } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 
 import { GripVertical } from 'lucide-react';
-import { useTasksContext } from '@/lib/tasks-context';
+import { useTasksContext } from '@/lib/use-tasks-context';
 import { TaskDto } from '@/server/dto/TaskDto';
 import Item from './Item';
 import Indicator from './Indicator';

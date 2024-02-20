@@ -29,7 +29,7 @@ interface Props {
 
 export default function SortableList({ rows }: Props) {
   const [active, setActive] = useState<Active | null>(null);
-  const { tasks, reorder } = useTasksContext();
+  const { tasks, reorderTasks } = useTasksContext();
 
   const activeItem = tasks.find((task: TaskDto) => task.id === active?.id);
 
@@ -49,7 +49,7 @@ export default function SortableList({ rows }: Props) {
       const activeIndex = rows.findIndex((id) => id === endActive.id);
       const overIndex = rows.findIndex((id) => id === over.id);
 
-      void reorder(arrayMove(rows, activeIndex, overIndex));
+      void reorderTasks(arrayMove(rows, activeIndex, overIndex));
     }
     setActive(null);
   };

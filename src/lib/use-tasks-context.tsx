@@ -11,7 +11,7 @@ import React, {
 interface TasksContextState {
   tasks: TaskDto[];
   addTask: (title: string, index: number) => Promise<void>;
-  reorder: (newRows: number[]) => Promise<void>;
+  reorderTasks: (newRows: number[]) => Promise<void>;
   updateTask: (task: TaskDto, index: number) => void;
 }
 
@@ -20,7 +20,7 @@ const TasksContext = createContext<TasksContextState | null>(null);
 export default function TasksContextProvider({
   tasks,
   addTask,
-  reorder,
+  reorderTasks,
   updateTask,
   children
 }: PropsWithChildren<TasksContextState>) {
@@ -28,7 +28,7 @@ export default function TasksContextProvider({
     () => ({
       tasks,
       addTask,
-      reorder,
+      reorderTasks,
       updateTask
     }),
     [tasks]

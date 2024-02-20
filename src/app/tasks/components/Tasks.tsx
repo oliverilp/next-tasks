@@ -1,33 +1,25 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import SortableList from '@/components/sortable/SortableList';
-import TasksContextProvider from '@/lib/tasks-context';
+import TasksContextProvider from '@/lib/use-tasks-context';
 import { TaskDto } from '@/server/dto/TaskDto';
 import { createTask } from '@/server/actions/create-task';
 import { updateTask } from '@/server/actions/update-task';
 import { useDebouncedCallback } from 'use-debounce';
 import { updateTaskOrder } from '@/server/actions/update-task-order';
+import { useOptimistic } from '@/lib/use-optimistic';
 import AddTask from './AddTask';
 
 interface Props {
   items: TaskDto[];
 }
 
-function getRows(items: TaskDto[]) {
-  return items.map(({ id }) => id);
-}
-
 function Tasks({ items }: Props) {
-  const [tasks, setTasks] = useState(items);
-  const [rows, setRows] = useState(getRows(items));
+  const [tasks, setTasks] = useOptimistic(items);
+  const cachedRows = useMemo(() => items.map(({ id }) => id), [items]);
+  const [rows, setRows] = useOptimistic<number[]>(cachedRows);
   const pendingUpdates = useRef<Map<number, TaskDto>>(new Map());
-
-  useEffect(() => {
-    setTasks(items);
-    setRows(getRows(items));
-    console.log('useEffect', items);
-  }, [items]);
 
   const debounced = useDebouncedCallback(async () => {
     const promises = Array.from(pendingUpdates.current.values()).map(
@@ -75,7 +67,7 @@ function Tasks({ items }: Props) {
       <TasksContextProvider
         tasks={tasks}
         addTask={add}
-        reorder={reorder}
+        reorderTasks={reorder}
         updateTask={update}
       >
         <AddTask />

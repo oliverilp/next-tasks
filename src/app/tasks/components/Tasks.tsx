@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import SortableList from '@/components/sortable/SortableList';
 import TasksContextProvider from '@/lib/tasks-context';
 import { TaskDto } from '@/server/dto/TaskDto';
@@ -21,21 +21,20 @@ function getRows(items: TaskDto[]) {
 function Tasks({ items }: Props) {
   const [tasks, setTasks] = useState(items);
   const [rows, setRows] = useState(getRows(items));
+  const pendingUpdates = useRef<Map<number, TaskDto>>(new Map());
 
   useEffect(() => {
     setTasks(items);
     setRows(getRows(items));
-    // console.log('useEffect', items);
+    console.log('useEffect', items);
   }, [items]);
 
-  useEffect(() => {
-    // console.log('new tasks', tasks);
-  }, [tasks]);
-
-  const debounced = useDebouncedCallback(async (task: TaskDto) => {
-    const result = await updateTask(task);
-
-    console.log('result', result);
+  const debounced = useDebouncedCallback(async () => {
+    const promises = Array.from(pendingUpdates.current.values()).map(
+      (task: TaskDto) => updateTask(task)
+    );
+    await Promise.all(promises);
+    pendingUpdates.current.clear();
   }, 1000);
 
   const add = async (title: string, index = 0) => {
@@ -49,8 +48,7 @@ function Tasks({ items }: Props) {
     setTasks([task, ...tasks]);
     setRows([fakeId, ...rows]);
 
-    const result = await createTask({ title, order: index });
-    console.log('result', result);
+    await createTask({ title, order: index });
   };
 
   const reorder = async (newRows: number[]) => {
@@ -62,14 +60,14 @@ function Tasks({ items }: Props) {
       .map((item, i) => ({ ...item, order: i }));
     setTasks(newTasks);
 
-    console.log('reorder');
-    console.log(await updateTaskOrder({ items: newTasks }));
+    await updateTaskOrder({ items: newTasks });
   };
 
   const update = (task: TaskDto, index: number) => {
-    console.log('update task', task.id);
     setTasks(tasks.toSpliced(index, 1, task));
-    void debounced(task);
+
+    pendingUpdates.current.set(task.id, task);
+    void debounced();
   };
 
   return (
